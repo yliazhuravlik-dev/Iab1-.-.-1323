@@ -1,4 +1,3 @@
-
 // Если BASE_H еще не определен, компилятор обработает код до #endif
 #ifndef BASE_H
 #define BASE_H
