@@ -16,15 +16,10 @@ public:
     ~Keeper();
     
     void add(Base* element);
-    
     void remove(int index);
-
     void printAll() const;
-    
     void saveToFile(const std::string& filename) const;
-  
     void loadFromFile(const std::string& filename);
-    
     Base* getElement(int index) const;
     
     int getSize() const;
