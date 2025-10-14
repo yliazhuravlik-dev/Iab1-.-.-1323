@@ -40,5 +40,4 @@ public:
     virtual Base* clone() const = 0;
 };
 
-// Конец: завершает условие #ifndef BASE_H
-#endif // BASE_H
+#endif 
