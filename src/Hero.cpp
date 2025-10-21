@@ -1,176 +1,192 @@
-// Подключаем заголовочный файл класса Hero
-#include "Hero.h"
+#include "Hero.h"                    // Подключение заголовочного файла класса Hero
+#include <iostream>                  // Подключение библиотеки для ввода/вывода
 
-// Подключаем библиотеку для работы с вводом-выводом, используется для std::cout, std::endl
-#include <iostream>
-
-// Подключаем библиотеку для работы с исключениями, спользуется для std::out_of_range
-#include <stdexcept>
-
-// Конструктор по умолчанию, использует список инициализации для установки начальных значений
-Hero::Hero() : name("Unknown"), weaponType("None") {
-    // Вывод отладочной информации в консоль
-    // Демонстрирует вызов конструктора (требование лабораторной)
-    std::cout << "Hero default constructor for " << name << std::endl;
+// Конструктор по умолчанию
+Hero::Hero() : Base(), weaponType("Unknown"), skills(nullptr), skillsCount(0) {
+    std::cout << "Hero default constructor called for: " << name << std::endl;  // Вывод отладочной информации
 }
 
-// Конструктор с параметрами: принимает имя и тип оружия, инициализирует поля
-Hero::Hero(const std::string& name, const std::string& weapon) 
-    : name(name), weaponType(weapon) {
-    // Список инициализации: name(name) - инициализация поля name параметром name
-    // Аналогично для weaponType(weapon)
-    std::cout << "Hero parametrized constructor for " << name << std::endl;
+// Конструктор с параметрами
+Hero::Hero(const std::string& name, const std::string& weapon, const std::string* skillsArr, int count)
+    : Base(name), weaponType(weapon), skillsCount(count) {  // Инициализация базового класса и полей
+
+    skills = new std::string[skillsCount];                  // Выделение памяти для массива навыков
+    for (int i = 0; i < skillsCount; i++) {                // Копирование навыков из переданного массива
+        skills[i] = skillsArr[i];
+    }
+    std::cout << "Hero parameterized constructor called for: " << name << std::endl;  // Отладочный вывод
 }
 
-// Конструктор копирования, создает глубокую копию объекта other
-Hero::Hero(const Hero& other) 
-    : name(other.name), 
-      weaponType(other.weaponType), 
-      skills(other.skills) {
-    // Копируем все поля из other в новый объект
-    // skills(other.skills) - копирует весь вектор навыков
-    std::cout << "Hero copy constructor for " << name << std::endl;
+// Конструктор копирования
+Hero::Hero(const Hero& other) : Base(other), weaponType(other.weaponType), skillsCount(other.skillsCount) {
+    skills = new std::string[skillsCount];                  // Выделение памяти для нового массива
+    for (int i = 0; i < skillsCount; i++) {                // Копирование навыков из другого объекта
+        skills[i] = other.skills[i];
+    }
+    std::cout << "Hero copy constructor called for: " << name << std::endl;  // Отладочный вывод
 }
 
-// Деструктор: автоматически вызывается при удалении объекта
+// Деструктор
 Hero::~Hero() {
-    // Вектор skills автоматически освобождает свою память
-    // Не требуется ручное удаление элементов
-    std::cout << "Hero destructor for " << name << std::endl;
+    clearSkills();                                          // Очистка динамической памяти
+    std::cout << "Hero destructor called for: " << name << std::endl;  // Отладочный вывод
 }
 
-// Set-метод для установки имени
-void Hero::setName(const std::string& name) {
-    // this->name обращается к полю класса (чтобы отличить от параметра)
-    this->name = name;
-}
-
-// Get-метод для получения имени
-std::string Hero::getName() const {
-    // Возвращаем копию строки name
-    return name;
-}
-
-// Set-метод для установки типа оружия
-void Hero::setWeaponType(const std::string& weapon) {
-    this->weaponType = weapon;
-}
-
-// Get-метод для получения типа оружия
-std::string Hero::getWeaponType() const {
-    return weaponType;
-}
-
-// Метод для добавления навыка
-void Hero::addSkill(const std::string& skill) {
-    // Метод push_back добавляет элемент в конец вектора: вектор автоматически увеличивает свой размер при необходимости
-    skills.push_back(skill);
-}
-
-// Метод для удаления навыка по индексу
-void Hero::removeSkill(int index) {
-    // Проверяем валидность индекса
-    if (index >= 0 && index < skills.size()) {
-        // Удаляем элемент по указанному индексу
-        // skills.begin() - итератор на начало вектора
-        skills.erase(skills.begin() + index);
-    } else {
-        // Генерируем исключение при неверном индексе
-        // std::out_of_range - стандартное исключение для выхода за границы
-        throw std::out_of_range("Invalid skill index for removal.");
-    }
-}
-
-// Метод для получения количества навыков
-int Hero::getSkillsCount() const {
-    // size() возвращает текущее количество элементов в векторе
-    return skills.size();
-}
-
-// Метод для получения навыка по индексу (только для чтения)
-const std::string& Hero::getSkill(int index) const {
-    // Проверяем валидность индекса
-    if (index >= 0 && index < skills.size()) {
-        // Возвращаем константную ссылку на строку (без копирования)
-        return skills[index];
-    } else {
-        throw std::out_of_range("Invalid skill index.");
-    }
-}
-
-// Метод для вывода информации о герое
-void Hero::print() const {
-    // Выводим основную информацию о герое
-    std::cout << "Hero: " << name << "\nWeapon: " << weaponType << "\nSkills: ";
-    
-    // Проверяем, есть ли навыки
-    if (skills.empty()) {
-        std::cout << "No skills";
-    } else {
-        // Проходим по всем навыкам и выводим их
-        for (size_t i = 0; i < skills.size(); ++i) {
-            std::cout << skills[i];
-            // Добавляем разделитель, кроме последнего элемента
-            if (i != skills.size() - 1) {
-                std::cout << "; ";
-            }
-        }
-    }
-    std::cout << "\n-------------------" << std::endl;
-}
-
-// Метод для сохранения данных в файл
-void Hero::saveToFile(std::ofstream& out) const {
-    // Записываем идентификатор типа для последующей загрузки
-    out << "Hero\n";
-    // Записываем имя (перевод строки как разделитель)
-    out << name << "\n";
-    // Записываем тип оружия
-    out << weaponType << "\n";
-    // Записываем количество навыков
-    out << skills.size() << "\n";
-    
-    // Записываем каждый навык на отдельной строке
-    for (const auto& skill : skills) {
-        out << skill << "\n";
-    }
-}
-
-// Метод для загрузки данных из файла
-void Hero::loadFromFile(std::ifstream& in) {
-    // Считываем имя (getline читает до символа новой строки)
-    std::getline(in, name);
-    // Считываем тип оружия
-    std::getline(in, weaponType);
-    
-    // Считываем количество навыков
-    int skillCount;
-    in >> skillCount;
-    // Игнорируем символ новой строки после числа
-    in.ignore();
-    
-    // Очищаем текущий список навыков
-    skills.clear();
-    
-    // Временная переменная для считывания навыков
-    std::string skill;
-    for (int i = 0; i < skillCount; ++i) {
-        // Считываем каждый навык
-        std::getline(in, skill);
-        // Добавляем в вектор
-        skills.push_back(skill);
-    }
+// Метод для очистки массива навыков
+void Hero::clearSkills() {
+    delete[] skills;                                        // Освобождение памяти массива
+    skills = nullptr;                                       // Обнуление указателя
+    skillsCount = 0;                                        // Сброс счетчика
 }
 
 // Перегрузка оператора присваивания
 Hero& Hero::operator=(const Hero& other) {
-    // Проверка на самоприсваивание (a = a)
-    if (this != &other) {
-        // Копируем все поля из other
-        name = other.name;
-        weaponType = other.weaponType;
-        skills = other.skills;  // Вектор поддерживает оператор =
+    if (this != &other) {                                   // Проверка на самоприсваивание
+        Base::operator=(other);                             // Вызов оператора присваивания базового класса
+        weaponType = other.weaponType;                      // Копирование типа оружия
+        skillsCount = other.skillsCount;                    // Копирование количества навыков
+
+        clearSkills();                                      // Очистка старых навыков
+        skills = new std::string[skillsCount];              // Выделение памяти для новых навыков
+        for (int i = 0; i < skillsCount; i++) {            // Копирование навыков
+            skills[i] = other.skills[i];
+        }
     }
-    // Возвращаем ссылку на текущий объект
-    return *this;
+    return *this;                                           // Возврат ссылки на текущий объект
+}
+
+// Метод для вывода информации о герое
+void Hero::display() const {
+    std::cout << "=== Hero ===" << std::endl;               // Заголовок вывода
+    std::cout << "Name: " << name << std::endl;             // Вывод имени
+    std::cout << "Weapon Type: " << weaponType << std::endl; // Вывод типа оружия
+    std::cout << "Skills (" << skillsCount << "): ";        // Вывод количества навыков
+    for (int i = 0; i < skillsCount; i++) {                // Цикл по всем навыкам
+        std::cout << skills[i];                             // Вывод текущего навыка
+        if (i < skillsCount - 1) std::cout << ", ";        // Добавление разделителя (кроме последнего)
+    }
+    std::cout << std::endl;                                 // Перевод строки
+}
+
+// Метод для редактирования героя
+void Hero::edit() {
+    std::cout << "Editing Hero: " << name << std::endl;     // Сообщение о начале редактирования
+    std::cout << "Enter new name: ";                        // Запрос нового имени
+    std::getline(std::cin, name);                           // Чтение имени из консоли
+
+    std::cout << "Enter weapon type: ";                     // Запрос типа оружия
+    std::getline(std::cin, weaponType);                     // Чтение типа оружия
+
+    std::cout << "Enter number of skills: ";                // Запрос количества навыков
+    std::cin >> skillsCount;                                // Чтение количества навыков
+    std::cin.ignore();                                      // Очистка буфера ввода
+
+    clearSkills();                                          // Очистка старых навыков
+    skills = new std::string[skillsCount];                  // Выделение памяти для новых навыков
+
+    for (int i = 0; i < skillsCount; i++) {                // Цикл для ввода каждого навыка
+        std::cout << "Enter skill " << (i + 1) << ": ";     // Запрос навыка
+        std::getline(std::cin, skills[i]);                  // Чтение навыка
+    }
+}
+
+// Метод для получения типа объекта
+std::string Hero::getType() const {
+    return "Hero";                                          // Возврат строки с типом объекта
+}
+
+// Метод для сохранения в файл (бинарный формат)
+void Hero::saveToFile(std::ofstream& file) const {
+    // Сохраняем тип объекта
+    std::string type = getType();                           // Получение типа объекта
+    int typeLength = type.length();                         // Длина строки типа
+    file.write(reinterpret_cast<const char*>(&typeLength), sizeof(typeLength));  // Запись длины типа
+    file.write(type.c_str(), typeLength);                   // Запись самого типа
+
+    // Сохраняем имя
+    int nameLength = name.length();                         // Длина имени
+    file.write(reinterpret_cast<const char*>(&nameLength), sizeof(nameLength));  // Запись длины имени
+    file.write(name.c_str(), nameLength);                   // Запись имени
+
+    // Сохраняем тип оружия
+    int weaponLength = weaponType.length();                 // Длина типа оружия
+    file.write(reinterpret_cast<const char*>(&weaponLength), sizeof(weaponLength));  // Запись длины
+    file.write(weaponType.c_str(), weaponLength);           // Запись типа оружия
+
+    // Сохраняем количество навыков
+    file.write(reinterpret_cast<const char*>(&skillsCount), sizeof(skillsCount));  // Запись количества
+
+    // Сохраняем каждый навык
+    for (int i = 0; i < skillsCount; i++) {                // Цикл по всем навыкам
+        int skillLength = skills[i].length();               // Длина текущего навыка
+        file.write(reinterpret_cast<const char*>(&skillLength), sizeof(skillLength));  // Запись длины
+        file.write(skills[i].c_str(), skillLength);         // Запись навыка
+    }
+}
+
+// Метод для загрузки из файла (бинарный формат)
+void Hero::loadFromFile(std::ifstream& file) {
+    // Загружаем имя
+    int nameLength;                                         // Переменная для длины имени
+    file.read(reinterpret_cast<char*>(&nameLength), sizeof(nameLength));  // Чтение длины имени
+    char* nameBuffer = new char[nameLength + 1];           // Выделение буфера для имени
+    file.read(nameBuffer, nameLength);                     // Чтение имени
+    nameBuffer[nameLength] = '\0';                         // Добавление нуль-терминатора
+    name = nameBuffer;                                     // Сохранение имени
+    delete[] nameBuffer;                                   // Освобождение буфера
+
+    // Загружаем тип оружия
+    int weaponLength;                                      // Переменная для длины типа оружия
+    file.read(reinterpret_cast<char*>(&weaponLength), sizeof(weaponLength));  // Чтение длины
+    char* weaponBuffer = new char[weaponLength + 1];       // Выделение буфера
+    file.read(weaponBuffer, weaponLength);                 // Чтение типа оружия
+    weaponBuffer[weaponLength] = '\0';                     // Добавление нуль-терминатора
+    weaponType = weaponBuffer;                             // Сохранение типа оружия
+    delete[] weaponBuffer;                                 // Освобождение буфера
+
+    // Загружаем количество навыков
+    file.read(reinterpret_cast<char*>(&skillsCount), sizeof(skillsCount));  // Чтение количества навыков
+
+    // Загружаем навыки
+    clearSkills();                                          // Очистка старых навыков
+    skills = new std::string[skillsCount];                  // Выделение памяти для новых навыков
+    for (int i = 0; i < skillsCount; i++) {                // Цикл по всем навыкам
+        int skillLength;                                    // Переменная для длины навыка
+        file.read(reinterpret_cast<char*>(&skillLength), sizeof(skillLength));  // Чтение длины
+        char* skillBuffer = new char[skillLength + 1];     // Выделение буфера для навыка
+        file.read(skillBuffer, skillLength);               // Чтение навыка
+        skillBuffer[skillLength] = '\0';                   // Добавление нуль-терминатора
+        skills[i] = skillBuffer;                           // Сохранение навыка
+        delete[] skillBuffer;                              // Освобождение буфера
+    }
+}
+
+// Get-метод для типа оружия
+std::string Hero::getWeaponType() const {
+    return weaponType;                                      // Возврат типа оружия
+}
+
+// Set-метод для типа оружия
+void Hero::setWeaponType(const std::string& weapon) {
+    weaponType = weapon;                                    // Установка нового типа оружия
+}
+
+// Get-метод для массива навыков
+std::string* Hero::getSkills() const {
+    return skills;                                          // Возврат указателя на массив навыков
+}
+
+// Get-метод для количества навыков
+int Hero::getSkillsCount() const {
+    return skillsCount;                                     // Возврат количества навыков
+}
+
+// Set-метод для навыков
+void Hero::setSkills(const std::string* skillsArr, int count) {
+    clearSkills();                                          // Очистка старых навыков
+    skillsCount = count;                                    // Установка нового количества
+    skills = new std::string[skillsCount];                  // Выделение памяти
+    for (int i = 0; i < skillsCount; i++) {                // Копирование новых навыков
+        skills[i] = skillsArr[i];
+    }
 }
