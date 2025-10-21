@@ -1,76 +1,49 @@
-#ifndef VILLAIN_H
-#define VILLAIN_H
+#ifndef VILLAIN_H                    // Защита от повторного включения файла
+#define VILLAIN_H                    // Определение макроса для защиты
 
-// Подключаем заголовок базового класса
-#include "Base.h"
+#include "Base.h"                    // Подключение базового класса
 
-// Подключаем стандартную библиотеку строк
-#include <string>
+class Villain : public Base {        // Объявление класса Villain, наследуемого от Base
+private:                             // Секция приватных членов класса
+    std::string weaponType;          // Тип оружия злодея
+    std::string crime;               // Описание преступления
+    std::string location;            // Место обитания/локация
+    std::string* skills;             // Указатель на массив навыков (динамическая память)
+    int skillsCount;                 // Количество навыков в массиве
 
-// Подключаем стандартный контейнер vector
-#include <vector>
+public:                              // Секция публичных методов
+    Villain();                       // Конструктор по умолчанию
+    Villain(const std::string& name, const std::string& weapon, const std::string& crime,
+        const std::string& location, const std::string* skillsArr, int count); // Конструктор с параметрами
+    Villain(const Villain& other);   // Конструктор копирования
+    ~Villain() override;             // Деструктор с переопределением
 
-// Класс Villain (Злодей) наследует от абстрактного класса Base
-class Villain : public Base {
-private:
-    // Поле для хранения имени злодея
-    std::string name;
-    
-    // Поле для хранения типа оружия злодея
-    std::string weaponType;
-    
-    // Поле для хранения описания злодеяния
-    std::string crime;
-    
-    // Поле для хранения места обитания/локации злодея
-    std::string location;
-    
-    // Динамический массив для хранения навыков злодея
-    std::vector<std::string> skills;
+    Villain& operator=(const Villain& other); // Оператор присваивания
 
-public:
-    // Конструктор по умолчанию
-    Villain();
-    
-    // Конструктор с параметрами
-    Villain(const std::string& name, const std::string& weapon, 
-            const std::string& crime, const std::string& location);
-    
-    // Конструктор копирования
-    Villain(const Villain& other);
-    
-    // Деструктор
-    ~Villain() override;
+    void display() const override;   // Метод отображения информации (переопределен)
+    void edit() override;            // Метод редактирования данных (переопределен)
+    std::string getType() const override; // Метод получения типа объекта (переопределен)
 
-    // Set/Get методы для имени (переопределенные из Base)
-    void setName(const std::string& name) override;
-    std::string getName() const override;
-    
-    // Set/Get методы для типа оружия
-    void setWeaponType(const std::string& weapon);
-    std::string getWeaponType() const;
-    
-    // Set/Get методы для злодеяния
-    void setCrime(const std::string& crime);
-    std::string getCrime() const;
-    
-    // Set/Get методы для локации
-    void setLocation(const std::string& location);
-    std::string getLocation() const;
-    
-    // Методы для работы с навыками
-    void addSkill(const std::string& skill);
-    void removeSkill(int index);
-    int getSkillsCount() const;
-    const std::string& getSkill(int index) const;
+    // Методы для работы с файлами
+    void saveToFile(std::ofstream& file) const override; // Сохранение в файл (переопределен)
+    void loadFromFile(std::ifstream& file) override;     // Загрузка из файла (переопределен)
 
-    // Реализация виртуальных методов из Base
-    void print() const override;
-    void saveToFile(std::ofstream& out) const override;
-    void loadFromFile(std::ifstream& in) override;
+    // Get/Set методы
+    std::string getWeaponType() const;     // Получение типа оружия
+    void setWeaponType(const std::string& weapon); // Установка типа оружия
 
-    // Перегрузка оператора присваивания
-    Villain& operator=(const Villain& other);
+    std::string getCrime() const;          // Получение описания преступления
+    void setCrime(const std::string& crime); // Установка описания преступления
+
+    std::string getLocation() const;       // Получение локации
+    void setLocation(const std::string& location); // Установка локации
+
+    std::string* getSkills() const;        // Получение массива навыков
+    int getSkillsCount() const;            // Получение количества навыков
+    void setSkills(const std::string* skillsArr, int count); // Установка навыков
+
+private:                            // Приватные вспомогательные методы
+    void clearSkills();             // Очистка массива навыков (освобождение памяти)
 };
 
-#endif
+#endif                              // Конец защиты от повторного включения
