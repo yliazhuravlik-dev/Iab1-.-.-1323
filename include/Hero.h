@@ -1,77 +1,40 @@
-// Защита от повторного включения заголовочного файла,предотвращает ошибки компиляции при множественном включении одного файла
-#ifndef HERO_H
-#define HERO_H
+#ifndef HERO_H                    // Защита от повторного включения файла
+#define HERO_H                    // Определение макроса HERO_H
 
-// Подключаем заголовок базового класса
-#include "Base.h"
+#include "Base.h"                 // Включение базового класса
 
-// Подключаем стандартную библиотеку строк
-#include <string>
+class Hero : public Base {        // Объявление класса Hero, наследуемого от Base
+private:                          // Секция приватных членов класса
+    std::string weaponType;       // Тип оружия героя (строка)
+    std::string* skills;          // Указатель на массив навыков (динамическая память)
+    int skillsCount;              // Количество навыков в массиве
 
-// Подключаем стандартный контейнер vector
-#include <vector>
+public:                           // Секция публичных методов
+    Hero();                       // Конструктор по умолчанию
+    Hero(const std::string& name, const std::string& weapon, const std::string* skillsArr, int count); // Конструктор с параметрами
+    Hero(const Hero& other);      // Конструктор копирования
+    ~Hero() override;             // Деструктор с переопределением
 
-// Объявление класса Hero, который наследует от абстрактного класса Base
-class Hero : public Base {
-private:
-    // Поле для хранения имени героя, использует std::string для динамического управления памятью
-    std::string name;
-    
-    // Поле для хранения типа оружия героя
-    std::string weaponType;
-    
-    // Динамический массив для хранения навыков героя, std::vector автоматически управляет памятью
-    std::vector<std::string> skills;
+    Hero& operator=(const Hero& other); // Оператор присваивания
 
-// Секция public - доступна извне класса
-public:
-    // Конструктор по умолчанию, инициализирует поля значениями по умолчанию
-    Hero();
-    
-    // Конструктор с параметрами, принимает имя и тип оружия для инициализации
-    Hero(const std::string& name, const std::string& weapon);
-    
-    // Конструктор копирования, создает новый объект как копию существующего
-    Hero(const Hero& other);
-    
-    // Деструктор: ключевое слово override указывает, что метод переопределяет базовый
-    ~Hero() override;
+    void display() const override;     // Метод отображения информации (виртуальный)
+    void edit() override;              // Метод редактирования (виртуальный)
+    std::string getType() const override; // Метод получения типа объекта (виртуальный)
 
-    // Set-метод для установки имени: override указывает на переопределение виртуального метода из Base
-    void setName(const std::string& name) override;
-    
-    // Get-метод для получения имени: const означает, что метод не изменяет состояние объекта
-    std::string getName() const override;
-    
-    // Set-метод для установки типа оружия
-    void setWeaponType(const std::string& weapon);
-    
-    // Get-метод для получения типа оружия
-    std::string getWeaponType() const;
-    
-    // Метод для добавления навыка в массив skills, принимает строку с названием навыка
-    void addSkill(const std::string& skill);
-    
-    // Метод для удаления навыка по индексу: может генерировать исключение при неверном индексе
-    void removeSkill(int index);
-    
-    // Метод для получения количества навыков: возвращает размер вектора skills
-    int getSkillsCount() const;
-    
-    // Метод для получения навыка по индексу: const версия - только для чтения
-    const std::string& getSkill(int index) const;
+    // Методы для работы с файлами
+    void saveToFile(std::ofstream& file) const override;  // Сохранение в файл
+    void loadFromFile(std::ifstream& file) override;      // Загрузка из файла
 
-    // Реализация чисто виртуального метода из Base: выводит информацию о герое в консоль
-    void print() const override;
-    
-    // Реализация чисто виртуального метода из Base: сохраняет данные героя в файл
-    void saveToFile(std::ofstream& out) const override;
-    
-    // Реализация чисто виртуального метода из Base: загружает данные героя из файла
-    void loadFromFile(std::ifstream& in) override;
+    // Get/Set методы
+    std::string getWeaponType() const;         // Получение типа оружия
+    void setWeaponType(const std::string& weapon); // Установка типа оружия
 
-    // Перегрузка оператора присваивания: обеспечивает корректное копирование  объектов
-    Hero& operator=(const Hero& other);
+    std::string* getSkills() const;            // Получение массива навыков
+    int getSkillsCount() const;                // Получение количества навыков
+    void setSkills(const std::string* skillsArr, int count); // Установка навыков
+
+private:                         // Приватные вспомогательные методы
+    void clearSkills();          // Очистка массива навыков (освобождение памяти)
 };
 
-#endif
+#endif                           // Конец защиты от повторного включения
